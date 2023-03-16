@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -118,7 +119,14 @@ func fetchURL(ctx context.Context, url string, ch chan<- string) {
 		ch <- ""
 		return
 	}
-	defer resp.Body.Close()
+
+	// Add a defer function to close the response body and log any error.
+	defer func() {
+		closeErr := resp.Body.Close()
+		if closeErr != nil {
+			log.Printf("Error closing response body: %v", closeErr)
+		}
+	}()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
