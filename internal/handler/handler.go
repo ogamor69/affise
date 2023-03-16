@@ -41,15 +41,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	data := processURLs(ctx, cancel, req.URLs)
 
-	var wg sync.WaitGroup
-	timeoutCtx, timeoutCancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer timeoutCancel()
-
-	if waitErr := waitGroupWithContext(timeoutCtx, &wg); waitErr != nil {
-		http.Error(w, "Some URLs failed to fetch", http.StatusInternalServerError)
-		return
-	}
-
 	resp := responsePayload{Data: data}
 	jsonData, err := json.Marshal(resp)
 	if err != nil {
@@ -120,7 +111,6 @@ func fetchURL(ctx context.Context, url string, ch chan<- string) {
 		return
 	}
 
-	// Add a defer function to close the response body and log any error.
 	defer func() {
 		closeErr := resp.Body.Close()
 		if closeErr != nil {
@@ -136,21 +126,3 @@ func fetchURL(ctx context.Context, url string, ch chan<- string) {
 
 	ch <- string(body)
 }
-
-// Func for waiting for all operations in the group to complete
-func waitGroupWithContext(ctx context.Context, wg *sync.WaitGroup) error {
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		wg.Wait()
-	}()
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-done:
-		return nil
-	}
-}
-
-// Path: internal/handler/handler_test.go

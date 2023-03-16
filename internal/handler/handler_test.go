@@ -2,11 +2,9 @@ package handler
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"sync"
 	"testing"
 	"time"
 
@@ -88,38 +86,4 @@ func TestHandlerSuccess(t *testing.T) {
 
 	expectedData := map[string]string{ts.URL: "mock response"}
 	assert.Equal(t, expectedData, resp.Data)
-}
-
-// Test for waitGroupWithContext function.
-func TestWaitGroupWithContext(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-	defer cancel()
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	go func() {
-		time.Sleep(50 * time.Millisecond)
-		wg.Done()
-	}()
-
-	err := waitGroupWithContext(ctx, &wg)
-	assert.NoError(t, err)
-}
-
-// Test for waitGroupWithContext function with a timeout.
-func TestWaitGroupWithContextTimeout(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-	defer cancel()
-
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	go func() {
-		time.Sleep(200 * time.Millisecond)
-		wg.Done()
-	}()
-
-	err := waitGroupWithContext(ctx, &wg)
-	assert.Equal(t, context.DeadlineExceeded, err)
 }
