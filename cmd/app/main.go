@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/ogamor69/affise/internal/app"
 	"github.com/ogamor69/affise/internal/handler"
+	"log"
+	"net"
 	"net/http"
 )
 
@@ -14,14 +16,21 @@ func main() {
 		Handler: mux,
 	}
 
-	//Chan for errors that occur when the server is running
+	// Create a listener with a limit of 100 simultaneous connections
+	listener, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		log.Fatalf("Failed to create listener: %v", err)
+	}
+	limitedListener := app.NewLimitedListener(listener, 100)
+
+	// Chan for errors that occur when the server is running
 	httpErrChan := make(chan error, 1)
 	// Chan for graceful shutdown
 	httpShutdownChan := make(chan struct{})
 
-	//Go routine for graceful shutdown
+	// Go routine for graceful shutdown
 	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := server.Serve(limitedListener); err != nil && err != http.ErrServerClosed {
 			httpErrChan <- err
 		}
 	}()
