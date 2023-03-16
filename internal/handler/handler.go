@@ -110,7 +110,7 @@ func fetchURL(ctx context.Context, url string, ch chan<- string) {
 		return
 	}
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: 1 * time.Second}
 	req = req.WithContext(ctx)
 
 	resp, err := client.Do(req)
