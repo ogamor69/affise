@@ -6,13 +6,13 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"time"
 )
 
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler.Handler)
 	server := &http.Server{
-		Addr:    ":8080",
 		Handler: mux,
 	}
 
@@ -21,20 +21,31 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create listener: %v", err)
 	}
-	limitedListener := app.NewLimitedListener(listener, 100)
+	limitedListener := app.NewLimitedListener(app.LimitedListenerConfig{
+		Listener:      listener,
+		Limit:         100,
+		AcceptTimeout: 5 * time.Second,
+		ErrorCallback: func(err error) {
+			log.Printf("Error: %v", err)
+		},
+	})
 
-	// Chan for errors that occur when the server is running
-	httpErrChan := make(chan error, 1)
-	// Chan for graceful shutdown
-	httpShutdownChan := make(chan struct{})
-
-	// Go routine for graceful shutdown
+	// Start the server
 	go func() {
 		if err := server.Serve(limitedListener); err != nil && err != http.ErrServerClosed {
-			httpErrChan <- err
+			log.Fatalf("Failed to serve: %v", err)
 		}
 	}()
 
-	// Function for graceful shutdown
+	// Channels for errors that occur when the server is running and for graceful shutdown
+	httpErrChan := make(chan error, 1)
+	httpShutdownChan := make(chan struct{})
+
+	// Call PerformGracefulShutdown function
 	app.PerformGracefulShutdown(server, httpErrChan, httpShutdownChan)
+
+	// Wait for all connections to finish
+	limitedListener.Wait()
+
+	log.Println("Server has been gracefully shut down")
 }

@@ -19,6 +19,8 @@ type responsePayload struct {
 	Data map[string]string `json:"data"`
 }
 
+// Handler обрабатывает HTTP-запросы, получает список URL-адресов и возвращает данные,
+// полученные от каждого из них.
 func Handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
@@ -52,7 +54,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonData)
 }
 
-// Func for processing a list of URLs
+// processURLs обрабатывает список URL-адресов, выполняет запросы и возвращает данные
+// в виде отображения URL-адресов на полученные данные.
 func processURLs(ctx context.Context, cancel context.CancelFunc, urls []string) map[string]string {
 	var wg sync.WaitGroup
 	data := make(map[string]string)
@@ -94,7 +97,8 @@ func processURLs(ctx context.Context, cancel context.CancelFunc, urls []string) 
 	return data
 }
 
-// Func for performing HTTP requests to URL
+// fetchURL выполняет HTTP-запрос к указанному URL-адресу и возвращает полученные данные
+// в канале ch.
 func fetchURL(ctx context.Context, url string, ch chan<- string) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -112,9 +116,9 @@ func fetchURL(ctx context.Context, url string, ch chan<- string) {
 	}
 
 	defer func() {
-		closeErr := resp.Body.Close()
+		closeErr := resp.Body.Close
 		if closeErr != nil {
-			log.Printf("Error closing response body: %v", closeErr)
+			log.Printf("Error closing response body: %v", closeErr())
 		}
 	}()
 
