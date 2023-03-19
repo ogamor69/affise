@@ -1,20 +1,44 @@
-# affise
+###Affise Task Fetcher
 
-[![Build Status](https://travis-ci.org/affise/affise.svg?branch=master)](https://travis-ci.org/affise/affise)
+Affise Task Fetcher is a small Go application that fetches data from a list of given URLs concurrently and returns the fetched data in JSON format. The application includes a limited listener, which allows a limited number of simultaneous connections, and a handler that processes the list of URLs and performs HTTP requests to each of them.
 
-## Running the project
+#Table of Contents
 
-go run main.go
+- [Installation](#installation)
+- [Usage](#usage)
+- [Testing](#testing)
+- [Author](#author)
 
-## Running the tests
+#Installation
 
-go test ./...
+1.Make sure you have Go installed on your machine. You can check the installation by running go version. If it's not installed, follow the instructions on Go's official website.
+2.Clone the repository:
+```bash git clone https://github.com/ogamor69/affise.git
+```
+3.Change into the project directory:
+```bash cd affise
+```
+4.Build the application:
+```bash go build
+```
 
-## handler_test.go
-Test for method not allowed.
-Test for invalid JSON payload.
-Test for URL limit exceeded.
-Test for successful handler execution.
-Test for waitGroupWithContext function.
-Test for waitGroupWithContext function with a timeout.
 
+#Usage
+
+1.Run the application:
+```bash ./affise
+```
+2.The server will start listening on :8080.
+3.Send a POST request with a JSON payload containing a list of URLs to fetch:
+```bash curl -X POST -H "Content-Type: application/json" -d '{"urls": ["https://www.google.com", "https://www.yahoo.com"]}' http://localhost:8080
+```
+
+#Testing
+
+1.Run the tests:
+```bash go test
+```
+
+#Author
+
+Raman Zaitsau - ogamor69
