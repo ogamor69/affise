@@ -13,7 +13,7 @@ Affise Task Fetcher is a small Go application that fetches data from a list of g
 - [Testing](#testing)
 
 
-#Installation
+##Installation
 
 1.Make sure you have Go installed on your machine. You can check the installation by running go version. If it's not installed, follow the instructions on Go's official website.
 2.Clone the repository:
@@ -30,7 +30,7 @@ go build
 ```
 
 
-#Usage
+##Usage
 
 1.Run the application:
 ```bash 
@@ -42,7 +42,7 @@ go build
 curl -X POST -H "Content-Type: application/json" -d '{"urls": ["https://www.google.com", "https://www.yahoo.com"]}' http://localhost:8080
 ```
 
-#Testing
+##Testing
 
 1.Run the tests:
 ```bash 
